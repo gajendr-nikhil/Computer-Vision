@@ -7,8 +7,8 @@ from ps1 import *
 def main():
 
     # TODO: Insert your image file paths here:
-    img1_filename = None
-    img2_filename = None
+    img1_filename = 'images/windows.png'
+    img2_filename = 'images/lena.png'
 
     # # 1a
     img1 = cv2.imread(img1_filename)
@@ -47,7 +47,7 @@ def main():
     # TODO: Choose the monochrome image for img1.
     # This could be either img1_green or img1_red based on what you
     # found out in the previous section.
-    mono1 = None
+    mono1 = img1_green
 
     mono2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
 
@@ -80,7 +80,7 @@ def main():
     # # 5 Noise
 
     # TODO: Choose a sigma value:
-    sigma = None
+    sigma = 15
 
     # # 5a
     channel = 1

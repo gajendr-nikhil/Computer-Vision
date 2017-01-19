@@ -17,7 +17,7 @@ def extractRed(image):
     Returns:
         numpy.array: Output 2D array containing the red channel.
     """
-    pass
+    return image[:, :, 2]
 
 
 def extractGreen(image):
@@ -31,7 +31,7 @@ def extractGreen(image):
     Returns:
         numpy.array: Output 2D array containing the green channel.
     """
-    pass
+    return image[:, :, 1]
 
 
 def extractBlue(image):
@@ -45,7 +45,7 @@ def extractBlue(image):
     Returns:
         numpy.array: Output 2D array containing the blue channel.
     """
-    pass   
+    return image[:, :, 0]
 
 
 def swapGreenBlue(image):
@@ -60,7 +60,9 @@ def swapGreenBlue(image):
     Returns:
         numpy.array: Output 3D array with the green and blue channels swapped.
     """
-    pass
+    img = np.copy(image)
+    img[:, :, 0], img[:, :, 1] = img[:, :, 1].copy(), img[:, :, 0].copy()
+    return img
 
 
 def copyPasteMiddle(src, dst, shape):
@@ -86,7 +88,21 @@ def copyPasteMiddle(src, dst, shape):
     Returns:
         numpy.array: Output monochrome image (2D array)
     """
-    pass
+    src_img = np.copy(src)
+    dst_img = np.copy(dst)
+
+    src_r_s = (src.shape[0] // 2) - (shape[0] // 2)
+    src_r_e = (src.shape[0] // 2) + (shape[0] // 2) + (shape[0] & 1)
+    src_c_s = (src.shape[1] // 2) - (shape[1] // 2)
+    src_c_e = (src.shape[1] // 2) + (shape[1] // 2) + (shape[1] & 1)
+
+    dst_r_s = (dst.shape[0] // 2) - (shape[0] // 2)
+    dst_r_e = (dst.shape[0] // 2) + (shape[0] // 2) + (shape[0] & 1)
+    dst_c_s = (dst.shape[1] // 2) - (shape[1] // 2)
+    dst_c_e = (dst.shape[1] // 2) + (shape[1] // 2) + (shape[1] & 1)
+
+    dst_img[dst_r_s:dst_r_e, dst_c_s:dst_c_e] = src_img[src_r_s:src_r_e, src_c_s:src_c_e]
+    return dst_img
 
 
 def imageStats(image):
@@ -108,7 +124,8 @@ def imageStats(image):
                mean (float): Input array mean / average value.
                stddev (float): Input array standard deviation.
     """
-    pass
+    temp_image = np.copy(np.float64(image))
+    return temp_image.min(), temp_image.max(), temp_image.mean(), temp_image.std()
 
 
 def normalized(image, scale):
@@ -130,7 +147,9 @@ def normalized(image, scale):
     Returns:
         numpy.array: Output 2D image.
     """
-    pass
+    temp_image = np.resize(np.float64(image), (1, image.shape[0] * image.shape[1]))
+    min_i, max_i, mean_i, stddev_i = temp_image.min(), temp_image.max(), temp_image.mean(), temp_image.std()
+    return np.resize(((((temp_image - mean_i) / stddev_i) * scale ) +  mean_i), (image.shape[0], image.shape[1]))
 
 
 def shiftImageLeft(image, shift):
@@ -155,7 +174,8 @@ def shiftImageLeft(image, shift):
     Returns:
         numpy.array: Output shifted 2D image.
     """
-    pass
+    temp_image = np.copy(image)
+    return cv2.copyMakeBorder(temp_image, 0, 0, 0, shift, cv2.BORDER_REPLICATE)[:, shift:]
 
 
 def differenceImage(img1, img2):
@@ -173,7 +193,10 @@ def differenceImage(img1, img2):
     Returns:
         numpy.array: Output 2D image containing the result of subtracting img2 from img1.
     """
-    pass
+    img = (img1 - img2)
+    if img.max() == 0 and img.min() == 0:
+        return img
+    return ((img * 1.0 - img.min()) / (img.max() - img.min())) * 255.0
 
 
 def addNoise(image, channel, sigma):
@@ -201,4 +224,9 @@ def addNoise(image, channel, sigma):
         numpy.array: Output 3D array containing the result of adding Gaussian noise to the
             specified channel.
     """
-    pass
+    temp_image = np.copy(np.float64(image))
+    r, c = temp_image[:, :, channel].shape
+    noise = np.random.randn(r, c) * sigma
+    temp_image[:, :, channel] = temp_image[:, :, channel] + noise
+    return temp_image
+
