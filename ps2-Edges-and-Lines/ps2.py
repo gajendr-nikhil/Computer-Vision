@@ -81,16 +81,39 @@ def hough_peaks(H, hough_threshold, nhood_delta, rows=None, cols=None):
     H_norm = cv2.normalize(H.copy(), alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
 
     # Your code here.
-
+    r, c = H_norm.shape
+    dr, dc = nhood_delta[0] * 2, nhood_delta[1] * 2
+    peaks = []
+    if r - dr >= 0 and c - dc >= 0:
+        for i in range(0, r - dr + 2, dr):
+            for j in range(0, c - dc + 2, dc):
+                for k in range(dr):
+                    broken = False
+                    for l in range(dc):
+                        if H_norm[i+k][j+l] >= hough_threshold:
+                            peaks.append([i+k, j+l])
+                            broken = True
+                            break
+                    if broken:
+                        break
+    else:
+        for i in range(r):
+            for j in range(c):
+                if H_norm[i][j] >= hough_threshold:
+                    peaks.append([i, j])
+                    break
+    return np.array(peaks)
     # Once you have all the detected peaks, you can eliminate the ones that represent
     # the same line. This will only be helpful when working with Hough lines.
     # The autograder does not pass these parameters when using a Hough circles array because it is not
     # needed. You can opt out from implementing this part, make sure you comment it out or delete it.
+    '''
     if rows is not None and cols is not None:
         # Aliasing Suppression.
         pass
 
     pass
+    '''
 
 
 def hough_circles_acc(img_orig, img_edges, radius, point_plus=True):
