@@ -41,7 +41,7 @@ def hough_lines_acc(img_edges, rho_res=1.0, theta_res=(math.pi/180)):
         for j in range(c):
             if img_edges[i][j]:
                 for k in range(len(theta)):
-                    d = j * math.cos(theta[k]) - i * math.sin(theta[k])
+                    d = j * math.cos(theta[k]) + i * math.sin(theta[k])
                     for l in range(len(rho)):
                         if rho[l] >= d:
                             H[l, k] += 1

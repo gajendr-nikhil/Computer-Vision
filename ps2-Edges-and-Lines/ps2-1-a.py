@@ -25,7 +25,7 @@ def hough_lines_acc(img_edges, rho_res=1.0, theta_res=(math.pi/180)):
         for j in range(c):
             if img_edges[i][j]:
                 for k in range(len(theta)):
-                    d = j * math.cos(theta[k]) - i * math.sin(theta[k])
+                    d = j * math.cos(theta[k]) + i * math.sin(theta[k])
                     for l in range(len(rho)):
                         if rho[l] >= d:
                             H[l, k] += 1
@@ -75,23 +75,87 @@ def hough_peaks(H, hough_threshold, nhood_delta, rows=None, cols=None):
                     break
     return np.array(peaks)
 
+
 PATH_in = "./input/"
 PATH_out = "./output/"
 
+'''
 img = cv2.imread(PATH_in + "ps2-input0.png", 0)
 
-img = cv2.Canny(img, 100, 200)
-img = img / 255.0
-plt.imsave(PATH_out+"ps2-1-a-1.png", img, cmap="Greys_r")
+img1 = cv2.Canny(img, 100, 200)
+img1 = img1 / 255.0
+plt.imsave(PATH_out+"ps2-1-a-1.png", img1, cmap="Greys_r")
 
-h, t, r = hough_lines_acc(img)
-#plt.imshow(h, cmap="coolwarm_r")
-print h.shape
-for i in range(len(h)):
-    for j in range(len(h[0])):
-        if h[i][j] == np.max(h):
-            print i, j
+h, r, t = hough_lines_acc(img1)
 plt.imsave(PATH_out + "ps2-2-a-1.png", h, cmap="coolwarm_r")
+plt.imshow(h, cmap="coolwarm_r")
 
+peaks = hough_peaks(h, 200, (2, 2))
+x_list = [x for [x,y] in peaks]
+y_list = [y for [x,y] in peaks]
 
-print hough_peaks(h, 254, (2, 2))
+plt.plot(y_list, x_list, "ro")
+plt.savefig(PATH_out + "ps2-2-b-1.png", cmap="coolwarm-r")
+
+print peaks
+color = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+for rho,theta in peaks:
+    rho = r[rho]
+    theta = t[theta]
+    a = np.cos(theta)
+    b = np.sin(theta)
+    x0 = a*rho
+    y0 = b*rho
+    x1 = int(x0 + 1000*(-b))
+    y1 = int(y0 + 1000*(a))
+    x2 = int(x0 - 1000*(-b))
+    y2 = int(y0 - 1000*(a))
+
+    cv2.line(color,(x1,y1),(x2,y2),(0,255,0),2)
+
+cv2.imwrite(PATH_out + "ps2-2-c-1.png", color)
+
+'''
+
+'''
+img = cv2.imread(PATH_in + "ps2-input0-noise.png", 0)
+img1 = cv2.GaussianBlur(img, (41,41), 0)
+plt.imsave(PATH_out+"ps2-3-a-1.png", img1, cmap="Greys_r")
+
+img2 = cv2.Canny(img, 10, 40)
+img2 = img2 / 255.0
+plt.imsave(PATH_out+"ps2-3-b-1.png", img2, cmap="Greys_r")
+
+img3 = cv2.Canny(img1, 10, 32)
+img3 = img3 / 255.0
+plt.imsave(PATH_out+"ps2-3-b-2.png", img3, cmap="Greys_r")
+
+h, r, t = hough_lines_acc(img3)
+#plt.imsave(PATH_out + "ps2-2-a-1.png", h, cmap="coolwarm_r")
+plt.imshow(h, cmap="coolwarm_r")
+
+peaks = hough_peaks(h, 200, (20, 20))
+x_list = [x for [x,y] in peaks]
+y_list = [y for [x,y] in peaks]
+
+plt.plot(y_list, x_list, "ro")
+plt.savefig(PATH_out + "ps2-3-c-1.png", cmap="coolwarm_r")
+
+print peaks
+color = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+for rho,theta in peaks:
+    rho = r[rho]
+    theta = t[theta]
+    a = np.cos(theta)
+    b = np.sin(theta)
+    x0 = a*rho
+    y0 = b*rho
+    x1 = int(x0 + 1000*(-b))
+    y1 = int(y0 + 1000*(a))
+    x2 = int(x0 - 1000*(-b))
+    y2 = int(y0 - 1000*(a))
+
+    cv2.line(color,(x1,y1),(x2,y2),(0,255,0),2)
+
+cv2.imwrite(PATH_out + "ps2-3-c-2.png", color)
+'''
