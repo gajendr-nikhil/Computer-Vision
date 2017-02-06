@@ -102,6 +102,19 @@ def hough_peaks(H, hough_threshold, nhood_delta, rows=None, cols=None):
                 if H_norm[i][j] >= hough_threshold:
                     peaks.append([i, j])
                     break
+    #'''
+    blacklist = []
+    speaks = sorted(peaks, key=lambda x: x[0])
+    for i in range(len(speaks) - 1):
+        if speaks[i][0] == speaks[i+1][0] or speaks[i][1] == speaks[i+1][1]:
+            blacklist.append(speaks[i])
+
+    ret_peaks = []
+    for i in range(len(peaks)):
+        if peaks[i] not in blacklist:
+            ret_peaks.append(peaks[i])
+    return np.array(ret_peaks)
+    #'''
     return np.array(peaks)
     # Once you have all the detected peaks, you can eliminate the ones that represent
     # the same line. This will only be helpful when working with Hough lines.
@@ -138,7 +151,41 @@ def hough_circles_acc(img_orig, img_edges, radius, point_plus=True):
         numpy.array: Hough accumulator array.
     """
 
-    pass
+    '''
+    if not point_plus:
+        H = np.zeros_like(img_orig, dtype=np.uint8)
+        r, c = H.shape
+        edge_indices = np.nonzero(img_edges)
+        for (row, col) in zip(*edge_indices):
+            for theta in np.linspace(-math.pi, math.pi, math.ceil(radius*2*math.pi)+1):
+                x_c = col + int(round(radius*math.cos(theta)))
+                y_c = row + int(round(radius*math.sin(theta)))
+                if x_c >= 0 and y_c >= 0 and x_c < c and y_c < r:
+                    H[y_c, x_c] += 1
+    #else:
+    return H
+    '''
+    H = np.zeros_like(img_orig, dtype=np.uint8)
+    r, c = H.shape
+    edge_indices = np.nonzero(img_edges)
+    if not point_plus:
+        for (row, col) in zip(*edge_indices):
+            for theta in np.linspace(-math.pi, math.pi, math.ceil(radius*2*math.pi)+1):
+                # Possible center of circle
+                x_c = col + int(round(radius*math.cos(theta)))
+                y_c = row + int(round(radius*math.sin(theta)))
+                if x_c >= 0 and y_c >= 0 and x_c < c and y_c < r:
+                    H[y_c, x_c] += 1
+    else:
+        sobelx = cv2.Sobel(img_orig, cv2.CV_64F, 1, 0, ksize=5)
+        sobely = cv2.Sobel(img_orig, cv2.CV_64F, 0, 1, ksize=5)
+        for (row, col) in zip(*edge_indices):
+            theta = math.atan2(sobely[row][col], sobelx[row][col])
+            x_c = col + int(round(radius*math.cos(theta)))
+            y_c = row + int(round(radius*math.sin(theta)))
+            if x_c >= 0 and y_c >= 0 and x_c < c and y_c < r:
+                H[y_c, x_c] += 1
+    return H
 
 
 def find_circles(img_orig, edge_img, radii, hough_threshold, nhood_delta):
@@ -167,7 +214,25 @@ def find_circles(img_orig, edge_img, radii, hough_threshold, nhood_delta):
                      contains [row_id, col_id, radius]
     """
 
-    pass
+    peaks = []
+    for radius in radii:
+        h = hough_circles_acc(img_orig, edge_img, radius, True)
+        p = hough_peaks(h, 250, (50, 50))
+        for i in range(len(p)):
+            tmp = list(p[i])
+            tmp.append(radius)
+            #'''
+            cont = False
+            for j in range(len(peaks)):
+                dist = math.sqrt((peaks[j][1] - tmp[1]) ** 2 + (peaks[j][0] - tmp[0]) ** 2)
+                if dist <= 6.0:
+                    peaks[j] = tmp
+                    cont = True
+            if not cont:
+                peaks.append(tmp)
+            #'''
+            #peaks.append(tmp)
+    return np.array(peaks)
 
 
 

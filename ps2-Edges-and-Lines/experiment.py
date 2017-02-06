@@ -59,8 +59,21 @@ def hough_lines_draw(img_in, peaks, rho, theta):
         numpy.array: 3-channel image with lines drawn.
     """
 
-    pass
+    color = cv2.cvtColor(img_in, cv2.COLOR_GRAY2BGR)
+    for r,t in peaks:
+        r = rho[r]
+        t = theta[t]
+        a = np.cos(t)
+        b = np.sin(t)
+        x0 = a*r
+        y0 = b*r
+        x1 = int(x0 + 1000*(-b))
+        y1 = int(y0 + 1000*(a))
+        x2 = int(x0 - 1000*(-b))
+        y2 = int(y0 - 1000*(a))
 
+        cv2.line(color,(x1,y1),(x2,y2),(0,255,0),2)
+    return color
 
 def highlight_peaks(H, peaks):
     """Returns a version of H with the best peaks highlighted.
