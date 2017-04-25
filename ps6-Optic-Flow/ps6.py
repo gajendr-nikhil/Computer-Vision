@@ -289,4 +289,20 @@ def hierarchical_lk(img_a, img_b, levels, k_size, k_type, sigma, interpolation, 
                              type.
             V (numpy.array): raw displacement (in pixels) along Y-axis, same size and type as U.
     """
-    pass
+    reduced_a = gaussian_pyramid(img_a, levels)
+    reduced_b = gaussian_pyramid(img_b, levels)
+    U = None
+    V = None
+    for i in range(len(reduced_a) - 1, -1, -1):
+        if i + 1 == levels:
+            U = np.zeros_like(reduced_a[i], dtype=np.float32)
+            V = np.zeros_like(reduced_a[i], dtype=np.float32)
+        else:
+            row, col = reduced_a[i].shape
+            U = (2 * expand_image(U))[:row, :col]
+            V = (2 * expand_image(V))[:row, :col]
+        C = warp(reduced_b[i], U, V, interpolation, border_mode)
+        Dx, Dy = optic_flow_lk(reduced_a[i], C, k_size, k_type, sigma)
+        U = U + Dx
+        V = V + Dy
+    return U, V

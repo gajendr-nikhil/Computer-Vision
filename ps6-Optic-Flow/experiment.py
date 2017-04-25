@@ -59,7 +59,12 @@ def scale_u_and_v(u, v, level, pyr):
     """
 
     # Todo: Your code here
-    pass
+    eu, ev = u, v
+    for l in range(level, 0, -1):
+        row, col = pyr[l -1].shape
+        eu = 2 * ps6.expand_image(eu)[:row, :col]
+        ev = 2 * ps6.expand_image(ev)[:row, :col]
+    return eu, ev
 
 
 def part_1a():
@@ -363,7 +368,34 @@ def part_4b():
 
     # Todo: Your code here
 
-    pass
+    levels = 15
+    k_size = 8
+    k_type = "uniform"
+    sigma = 1
+    interpolation = cv2.INTER_CUBIC
+    border_mode = cv2.BORDER_REFLECT101
+
+    uyos02, vyos02 = ps6.hierarchical_lk(yos_img_01, yos_img_02, levels, k_size, k_type, sigma, interpolation, border_mode)
+    jet_uyos02_vyos02 = jet_colormaps(uyos02, vyos02)
+
+    # You may want to try different parameters for the remaining function calls.
+    uyos03, vyos03 = ps6.hierarchical_lk(yos_img_01, yos_img_03, levels, k_size, k_type, sigma, interpolation, border_mode)
+    jet_uyos03_vyos03 = jet_colormaps(uyos03, vyos03)
+
+    jets_stacked = np.concatenate((jet_uyos02_vyos02, jet_uyos03_vyos03), axis=0)
+    cv2.imwrite(os.path.join(output_dir, "ps6-4-b-1.png"), jets_stacked)
+
+    # Save difference between each warped image and original image (Shift0), stacked
+    yos_img_02_warped = ps6.warp(yos_img_02, uyos02, vyos02, interpolation, border_mode)
+    yos_img_03_warped = ps6.warp(yos_img_03, uyos03, vyos03, interpolation, border_mode)
+
+    diff_1_2 = yos_img_02_warped - yos_img_01
+    diff_1_3 = yos_img_03_warped - yos_img_01
+
+    diff_stacked = np.concatenate((ps6.normalize_and_scale(diff_1_2),
+                                   ps6.normalize_and_scale(diff_1_3)),
+                                  axis=0)
+    cv2.imwrite(os.path.join(output_dir, "ps6-4-b-2.png"), diff_stacked)
 
 
 def part_4c():
@@ -394,7 +426,34 @@ def part_4c():
     dtsq2_03 = cv2.GaussianBlur(dtsq2_03, (7, 7), 2)
 
     # Todo: Your code here
-    pass
+    levels = 15
+    k_size = 8
+    k_type = "uniform"
+    sigma = 1
+    interpolation = cv2.INTER_CUBIC
+    border_mode = cv2.BORDER_REFLECT101
+
+    uyos02, vyos02 = ps6.hierarchical_lk(dtsq2_01, dtsq2_02, levels, k_size, k_type, sigma, interpolation, border_mode)
+    jet_uyos02_vyos02 = jet_colormaps(uyos02, vyos02)
+
+    # You may want to try different parameters for the remaining function calls.
+    uyos03, vyos03 = ps6.hierarchical_lk(dtsq2_01, dtsq2_03, levels, k_size, k_type, sigma, interpolation, border_mode)
+    jet_uyos03_vyos03 = jet_colormaps(uyos03, vyos03)
+
+    jets_stacked = np.concatenate((jet_uyos02_vyos02, jet_uyos03_vyos03), axis=0)
+    cv2.imwrite(os.path.join(output_dir, "ps6-4-c-1.png"), jets_stacked)
+
+    # Save difference between each warped image and original image (Shift0), stacked
+    yos_img_02_warped = ps6.warp(dtsq2_02, uyos02, vyos02, interpolation, border_mode)
+    yos_img_03_warped = ps6.warp(dtsq2_03, uyos03, vyos03, interpolation, border_mode)
+
+    diff_1_2 = yos_img_02_warped - dtsq2_01
+    diff_1_3 = yos_img_03_warped - dtsq2_01
+
+    diff_stacked = np.concatenate((ps6.normalize_and_scale(diff_1_2),
+                                   ps6.normalize_and_scale(diff_1_3)),
+                                  axis=0)
+    cv2.imwrite(os.path.join(output_dir, "ps6-4-c-2.png"), diff_stacked)
 
 
 def part_5a():
