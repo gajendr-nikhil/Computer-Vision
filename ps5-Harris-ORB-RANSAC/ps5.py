@@ -208,7 +208,13 @@ def get_descriptors(image, keypoints):
     """
 
     # Normalize image
-    pass
+    image_norm = cv2.normalize(image, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+    # Do not modify the code above. Continue working with r_norm.
+
+    # Note: You can use OpenCV's ORB.compute() method to extract descriptors, or write your own!
+    orb = cv2.ORB()
+    new_kp, descriptors = orb.compute(image_norm, keypoints)
+    return descriptors, new_kp
 
 
 def match_descriptors(desc1, desc2):
@@ -226,7 +232,8 @@ def match_descriptors(desc1, desc2):
 
     # Note: You can use OpenCV's descriptor matchers, or write your own!
     #       Make sure you use Hamming Normalization to match the autograder.
-    pass
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+    return bf.match(desc1, desc2)
 
 
 def draw_matches(image1, image2, kp1, kp2, matches):
@@ -249,7 +256,23 @@ def draw_matches(image1, image2, kp1, kp2, matches):
     """
 
     # Note: DO NOT use OpenCV's match drawing function(s)! Write your own.
-    pass
+    image1 = cv2.cvtColor(np.uint8(image1 * 255.0), cv2.COLOR_GRAY2BGR)
+    image2 = cv2.cvtColor(np.uint8(image2 * 255.0), cv2.COLOR_GRAY2BGR)
+    list_kp1 = []
+    list_kp2 = []
+    for mat in matches:
+        img1_idx = mat.queryIdx
+        img2_idx = mat.trainIdx
+        (x1,y1) = tuple(map(int, kp1[img1_idx].pt))
+        (x2,y2) = tuple(map(int, kp2[img2_idx].pt))
+        cv2.circle(image1, (x1, y1), 3, (0, 0, 255), -1)
+        cv2.circle(image2, (x2, y2), 3, (0, 0, 255), -1)
+        list_kp1.append((x1, y1))
+        list_kp2.append(((image1.shape[1]) + x2, y2))
+    image = make_image_pair(image1, image2)
+    for i in range(len(list_kp1)):
+        cv2.line(image, list_kp1[i], list_kp2[i], (0,0,255), 1)
+    return image
 
 
 def compute_translation_RANSAC(kp1, kp2, matches, thresh):
