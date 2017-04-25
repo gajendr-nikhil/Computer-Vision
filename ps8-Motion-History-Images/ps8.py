@@ -30,6 +30,7 @@ class MotionHistoryBuilder(object):
         #
         # The way to do it is:
         # self.some_parameter_name = kwargs.get('parameter_name', default_value)
+        self.I_t_1 = None
 
     def get_b_t(self, frame, prev_frame):
         """Calculates the binary image B_t.
@@ -49,8 +50,14 @@ class MotionHistoryBuilder(object):
             numpy.array: binary image containing 0s or 1s.
 
         """
-
-        pass
+        # frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY).astype(np.float32)
+        # prev_frame_gray = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY).astype(np.float32)
+        # diff = np.absolute(frame_gray - prev_frame_gray)
+        diff = np.absolute(frame.astype(np.float32) - prev_frame.astype(np.float32))
+        B_t = np.zeros_like(diff)
+        idx = np.where(diff >= self.theta)
+        B_t[idx] = 1
+        return B_t
 
     def process(self, frame):
         """Processes a frame of video returning a binary image indicating motion areas.

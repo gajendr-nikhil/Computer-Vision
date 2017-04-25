@@ -170,7 +170,8 @@ def match_features(a_features_dict, b_features_dict, n_actions, scale=0.5):
 
 def part_1a():
     filename = "PS8A1P1T1.mp4"  # Video file that represents Action 1, Person 1, Trial 1
-    theta = 0.  # Define a value for theta
+    theta = 4.0  # Define a value for theta
+    tau = 10
     build_motion_history_image(MotionHistoryBuilder,  # motion history builder class
                                os.path.join(input_dir, filename),  # input video
                                save_frames={
@@ -178,7 +179,11 @@ def part_1a():
                                    20: os.path.join(output_dir, 'ps8-1-a-2.png'),
                                    30: os.path.join(output_dir, 'ps8-1-a-3.png')
                                },
-                               theta=theta)  # Specify any other keyword args that your motion history builder
+                               theta=theta,
+                               tau=tau,
+                               ke=(8, 8),
+                               kd=(8, 8)
+                               )  # Specify any other keyword args that your motion history builder
                                              # expects, e.g. theta, tau
 
 
