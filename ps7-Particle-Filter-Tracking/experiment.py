@@ -328,10 +328,10 @@ def part_4():
     """
     return
     #'''
-    num_particles = 0.  # Define the number of particles
-    sigma_mse = 0.  # Define the value of sigma for the measurement exponential equation
-    sigma_dyn = 0.  # Define the value of sigma for the particles movement (dynamics)
-    template_rect = {}  # suggested template window (dict)
+    num_particles = 100  # Define the number of particles
+    sigma_mse = 10.0  # Define the value of sigma for the measurement exponential equation
+    sigma_dyn = 10.0  # Define the value of sigma for the particles movement (dynamics)
+    template_rect = {'x': int(260.8751), 'y': int(115.1776), 'w': int(192.5404), 'h': int(218.0504)}  # suggested template window (dict)
 
     run_particle_filter(ParticleFilter,  # particle filter model class
                         os.path.join(input_dir, "pres_debate.mp4"),  # input video
@@ -360,10 +360,10 @@ def part_4():
                         template_coords=template_rect)  # Add more if you need to
 
 
-    num_particles = 0.  # Define the number of particles
-    sigma_mse = 0.  # Define the value of sigma for the measurement exponential equation
-    sigma_dyn = 0.  # Define the value of sigma for the particles movement (dynamics)
-    template_rect = {}  # suggested template window (dict)
+    num_particles = 100  # Define the number of particles
+    sigma_mse = 1.0  # Define the value of sigma for the measurement exponential equation
+    sigma_dyn = 10.0  # Define the value of sigma for the particles movement (dynamics)
+    template_rect = {'x': int(320.8751), 'y': int(175.1776), 'w': int(102.5404), 'h': int(128.0504)}  # suggested template window (dict)
 
     run_particle_filter(ParticleFilter,  # particle filter model class
                         os.path.join(input_dir, "pres_debate.mp4"),  # input video
@@ -377,10 +377,10 @@ def part_4():
                         num_particles=num_particles, sigma_exp=sigma_mse, sigma_dyn=sigma_dyn,
                         template_coords=template_rect)  # Add more if you need to
 
-    num_particles = 0.  # Define the number of particles
-    sigma_mse = 0.  # Define the value of sigma for the measurement exponential equation
-    sigma_dyn = 0.  # Define the value of sigma for the particles movement (dynamics)
-    template_rect = {}  # suggested template window (dict)
+    num_particles = 100  # Define the number of particles
+    sigma_mse = 1000.0  # Define the value of sigma for the measurement exponential equation
+    sigma_dyn = 10.0  # Define the value of sigma for the particles movement (dynamics)
+    template_rect = {'x': int(320.8751), 'y': int(175.1776), 'w': int(102.5404), 'h': int(128.0504)}  # suggested template window (dict)
 
     run_particle_filter(ParticleFilter,  # particle filter model class
                         os.path.join(input_dir, "pres_debate.mp4"),  # input video
@@ -394,10 +394,10 @@ def part_4():
                         num_particles=num_particles, sigma_exp=sigma_mse, sigma_dyn=sigma_dyn,
                         template_coords=template_rect)  # Add more if you need to
 
-    num_particles = 0.  # Define the number of particles
-    sigma_mse = 0.  # Define the value of sigma for the measurement exponential equation
-    sigma_dyn = 0.  # Define the value of sigma for the particles movement (dynamics)
-    template_rect = {}  # suggested template window (dict)
+    num_particles = 40  # Define the number of particles
+    sigma_mse = 10.0  # Define the value of sigma for the measurement exponential equation
+    sigma_dyn = 10.0  # Define the value of sigma for the particles movement (dynamics)
+    template_rect = {'x': int(320.8751), 'y': int(175.1776), 'w': int(102.5404), 'h': int(128.0504)}  # suggested template window (dict)
 
     run_particle_filter(ParticleFilter,  # particle filter model class
                         os.path.join(input_dir, "pres_debate.mp4"),  # input video
@@ -413,11 +413,12 @@ def part_4():
     #'''
 
 def part_5():
-    num_particles = 0.  # Define the number of particles
-    sigma_md = 0.  # Define the value of sigma for the measurement exponential equation
-    sigma_dyn = 0.  # Define the value of sigma for the particles movement (dynamics)
-    hist_bins_num = 0.  # Define the number of bins
-    template_rect = {}  # Define the template window values
+    num_particles = 150  # Define the number of particles
+    sigma_md = 10.0  # Define the value of sigma for the measurement exponential equation
+    sigma_dyn = 10.0  # Define the value of sigma for the particles movement (dynamics)
+    hist_bins_num = 6  # Define the number of bins
+    #template_rect = {'x': 210, 'y': 70, 'w': 92, 'h': 234}  # Define the template window values
+    template_rect = {'x': 230, 'y': 85, 'w': 70, 'h': 170}  # Define the template window values
 
     run_particle_filter(MDParticleFilter,
                         os.path.join(input_dir, "pedestrians.mp4"),
