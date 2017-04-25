@@ -339,7 +339,40 @@ def compute_similarity_RANSAC(kp1, kp2, matches, thresh):
     # (i.e. brute-force) you will not get credit for either the autograder tests or the report
     # sections that depend of this function.
 
-    pass
+    N, sample_count = float('inf'), 0.0
+    best_consensus, best_delta, best_n = [], np.zeros((2, 2)), 0
+    while N > sample_count:
+        consensus, inliers = [], 0
+        indx = random.sample(range(len(matches)), 2)
+        A = np.hstack((np.reshape(np.asarray(kp1[matches[indx[0]].queryIdx].pt), (2, 1)), np.reshape(np.asarray(kp1[matches[indx[1]].queryIdx].pt), (2, 1))))
+        B = np.hstack((np.reshape(np.asarray(kp2[matches[indx[0]].trainIdx].pt), (2, 1)), np.reshape(np.asarray(kp2[matches[indx[1]].trainIdx].pt), (2, 1))))
+        matX = np.linalg.lstsq(A, B)[0]
+        for i in range(len(matches)):
+            for j in range(i, len(matches)):
+                if i in indx and j in indx:
+                    continue
+                a = np.hstack((np.reshape(np.asarray(kp1[matches[i].queryIdx].pt), (2, 1)), np.reshape(np.asarray(kp1[matches[j].queryIdx].pt), (2, 1))))
+                b = np.hstack((np.reshape(np.asarray(kp2[matches[i].trainIdx].pt), (2, 1)), np.reshape(np.asarray(kp2[matches[j].trainIdx].pt), (2, 1))))
+                xmat = np.linalg.lstsq(a, b)[0]
+                if np.sqrt(np.sum((matX - xmat) ** 2)) <= thresh:
+                    consensus.append(matches[i])
+                    consensus.append(matches[j])
+                    inliers += 2
+        if inliers > best_n:
+            best_n = inliers
+            best_delta = np.resize(matX, (2, 2))
+            best_consensus = deepcopy(consensus)
+            N = np.log(1 - 0.99) / np.log(1 - (1 - (1 - (inliers / len(matches)))) ** 2)
+        sample_count += 1
+
+    ret_M = np.zeros((2, 3))
+    ret_M[0][0] = best_delta[0][0]
+    ret_M[0][1] = -best_delta[0][1]
+    ret_M[0][2] = best_delta[1][0]
+    ret_M[1][0] = best_delta[0][1]
+    ret_M[1][1] = best_delta[0][0]
+    ret_M[1][2] = best_delta[1][1]
+    return ret_M, best_consensus
 
 
 def compute_affine_RANSAC(kp1, kp2, matches, thresh):

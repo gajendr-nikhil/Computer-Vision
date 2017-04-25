@@ -232,7 +232,7 @@ def part_3a(ps5_obj):
     k_pts = ps5_obj.get_keypoints()
     matches = ps5_obj.get_matches()
 
-    threshold = 0  # Todo: Define a threshold value.
+    threshold = 100  # Todo: Define a threshold value.
     translation, good_matches = ps5.compute_translation_RANSAC(k_pts["trans_a"], k_pts["trans_b"],
                                                                matches["trans"], threshold)
 
@@ -252,7 +252,7 @@ def part_3b(ps5_obj, save_imgs=True):
     k_pts = ps5_obj.get_keypoints()
     matches = ps5_obj.get_matches()
 
-    threshold = 0.  # Todo: Define a threshold value.
+    threshold = 100.  # Todo: Define a threshold value.
     similarity, sim_good_matches = ps5.compute_similarity_RANSAC(k_pts["sim_a"], k_pts["sim_b"],
                                                                  matches["sim"], threshold)
 
@@ -274,7 +274,7 @@ def part_3c(ps5_obj, save_imgs=True):
     k_pts = ps5_obj.get_keypoints()
     matches = ps5_obj.get_matches()
 
-    threshold = 0.  # Todo: Define a threshold value.
+    threshold = 100.  # Todo: Define a threshold value.
     similarity_affine, sim_aff_good_matches = ps5.compute_affine_RANSAC(k_pts["sim_a"], k_pts["sim_b"],
                                                                         matches["sim"], threshold)
 
