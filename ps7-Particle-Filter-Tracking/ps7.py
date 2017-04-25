@@ -295,6 +295,19 @@ class MeanShiftLitePF(ParticleFilter):
         # The way to do it is:
         # self.some_parameter_name = kwargs.get('parameter_name', default_value)
 
+    def mslcpq(self, patch, template):
+        hb_t = cv2.calcHist([template],[0],None,[self.num_bins],[0,256]).T
+        hg_t = cv2.calcHist([template],[1],None,[self.num_bins],[0,256]).T
+        hr_t = cv2.calcHist([template],[2],None,[self.num_bins],[0,256]).T
+        h_t = np.hstack((hb_t, hg_t, hr_t))
+        hb_p = cv2.calcHist([patch],[0],None,[self.num_bins],[0,256]).T
+        hg_p = cv2.calcHist([patch],[1],None,[self.num_bins],[0,256]).T
+        hr_p = cv2.calcHist([patch],[2],None,[self.num_bins],[0,256]).T
+        h_p = np.hstack((hb_p, hg_p, hr_p))
+        nr = np.square(h_t - h_p)
+        dr = h_t + h_p
+        dr[np.where(dr == 0.0)] = float('inf')
+        return 0.5 * np.sum(nr / dr)
 
     def process(self, frame):
         """Processes a video frame (image) and updates the filter's state.
@@ -308,7 +321,47 @@ class MeanShiftLitePF(ParticleFilter):
         Returns:
             None.
         """
-        pass
+        if self.frame_number <= 9:
+            nump = self.nxpart * self.num_particles
+        else:
+            nump = self.num_particles
+        xf_new = np.zeros_like(self.xf)
+        w_new = np.copy(self.weights)
+        for i in range(nump):
+            sample = self.xf[:, np.random.choice(np.arange(nump), 1, replace=True, p=self.weights)[0]]
+            while True:
+                rnum = int(np.random.randn() * self.sigma_dyn + self.sigma_dyn/2.0)
+                if (sample[1] + rnum) < int(self.template_rect['w'] // 2):
+                    xf_new[:, i][1] = int(self.template_rect['w'] // 2)
+                elif (sample[1] + rnum) >= int(self.fx - self.template_rect['w'] // 2):
+                    xf_new[:, i][1] = int(self.fx - self.template_rect['w'] // 2)
+                else:
+                    xf_new[:, i][1] = (sample[1] + rnum)
+                rnum = int(np.random.randn() * self.sigma_dyn + self.sigma_dyn/2.0)
+                if (sample[0] + rnum) < int(self.template_rect['h'] // 2):
+                    xf_new[:, i][0] = int(self.template_rect['h'] // 2)
+                elif (sample[0] + rnum) >= int(self.fy - self.template_rect['h'] // 2):
+                    xf_new[:, i][0] = int(self.fy - self.template_rect['h'] // 2)
+                else:
+                    xf_new[:, i][0] = (sample[0] + rnum)
+                break
+            self.particles[i] = xf_new[:, i]
+
+            patch = frame[xf_new[:, i][0] - self.hy -1 : xf_new[:, i][0] + self.hy + 1, xf_new[:, i][1] - self.wx -1 : xf_new[:, i][1] + self.wx + 1].astype(np.float32)
+
+            chi = self.mslcpq(patch, self.template.astype(np.float32))
+
+            w_new[i] = np.exp(-chi / (2 * self.sigma_exp))
+
+        self.xf = xf_new
+        self.weights = np.copy(w_new)
+        if np.sum(self.weights) > 0.0:
+            self.weights = self.weights / np.sum(self.weights)
+        else:
+            self.weights = np.ones(nump, dtype=np.float64) / (nump)
+
+        self.frame_number += 1
+        #print "frame number... %s" %self.frame_number
 
 
 class MDParticleFilter(ParticleFilter):

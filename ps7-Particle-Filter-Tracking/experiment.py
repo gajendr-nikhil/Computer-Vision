@@ -273,11 +273,11 @@ def part_2b():
 
 
 def part_3a():
-    num_particles = 0.  # Define the number of particles
-    sigma_chi = 0.  # Define the value of sigma for the measurement exponential equation
-    sigma_dyn = 0.  # Define the value of sigma for the particles movement (dynamics)
-    hist_bins_num = 0.
-    template_rect = {}  # Define the template window values
+    num_particles = 100  # Define the number of particles
+    sigma_chi = 10.0  # Define the value of sigma for the measurement exponential equation
+    sigma_dyn = 10.0  # Define the value of sigma for the particles movement (dynamics)
+    hist_bins_num = 8
+    template_rect = {'x': int(320.8751), 'y': int(175.1776), 'w': int(102.5404), 'h': int(128.0504)}
 
     run_particle_filter(MeanShiftLitePF,
                         os.path.join(input_dir, "pres_debate.mp4"),
@@ -294,12 +294,12 @@ def part_3a():
 
 
 def part_3b():
-    num_particles = 0.  # Define the number of particles
-    sigma_chi = 0.  # Define the value of sigma for the measurement exponential equation
-    sigma_dyn = 0.  # Define the value of sigma for the particles movement (dynamics)
-    hist_bins_num = 0.  # Define the number of bins
-    alpha = 0.  # Set a value for alpha
-    template_rect = {}  # Define the template window values
+    num_particles = 100  # Define the number of particles
+    sigma_chi = 10.0  # Define the value of sigma for the measurement exponential equation
+    sigma_dyn = 10.0  # Define the value of sigma for the particles movement (dynamics)
+    hist_bins_num = 6  # Define the number of bins
+    alpha = 0.50  # Set a value for alpha
+    template_rect = {'x': 548, 'y': 412, 'w': 38, 'h': 46}  # Define the template window values
 
     run_particle_filter(MeanShiftLitePF,
                         os.path.join(input_dir, "pres_debate.mp4"),
