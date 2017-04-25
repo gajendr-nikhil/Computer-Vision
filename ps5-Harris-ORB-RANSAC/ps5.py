@@ -74,7 +74,12 @@ def harris_response(ix, iy, kernel_dims, alpha):
     Returns:
         numpy.array: Harris response map, same size as inputs, floating-point.
     """
-    pass
+    sixx = cv2.GaussianBlur(np.square(ix), kernel_dims, 1)
+    siyy = cv2.GaussianBlur(np.square(iy), kernel_dims, 1)
+    sixy = cv2.GaussianBlur(ix * iy, kernel_dims, 1)
+    trace = sixx + sixy
+    det = sixx * siyy - sixy * sixy
+    return (det - alpha * trace)
 
 
 def find_corners(r_map, threshold, radius):

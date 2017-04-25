@@ -109,10 +109,12 @@ def part_1a(ps5_obj, save_imgs=True):
 def part_1b(ps5_obj, save_imgs=True):
 
     # Todo: Define the kernel dimensions for each image
-    kernel_dims = {}
+    kernel_dims = {"trans_a": (5, 5), "trans_b": (5, 5),
+                   "sim_a": (5, 5), "sim_b": (5, 5)}
 
     # Todo: Define alpha values for each image (floats)
-    alpha = {}
+    alpha = {"trans_a": 0.05, "trans_b": 0.05,
+             "sim_a": 0.05, "sim_b": 0.05}
 
     ps5_obj.calculate_r_maps(kernel_dims, alpha)
 
