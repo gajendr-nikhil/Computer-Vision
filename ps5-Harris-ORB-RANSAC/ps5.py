@@ -158,7 +158,12 @@ def gradient_angle(ix, iy):
     Returns:
         numpy.array: gradient angle image, same shape as ix and iy. Values must be in degrees [0.0, 360).
     """
-    pass
+    artan = (np.arctan2(iy, ix) * 180.0) / np.pi
+    idx = np.where(artan < 0.0)
+    artan[idx] += 360.0
+    idx = np.where(artan >= 360.0)
+    artan[idx] -= 360.0
+    return artan
 
 
 def get_keypoints(points, angle, size, octave=0):
@@ -180,7 +185,10 @@ def get_keypoints(points, angle, size, octave=0):
     """
 
     # Note: You should be able to plot the keypoints using cv2.drawKeypoints() in OpenCV 2.4.9+
-    pass
+    kp_obj = []
+    for x, y in points:
+        kp_obj.append(cv2.KeyPoint(x, y, _size=size, _angle=angle[y][x], _octave=octave))
+    return kp_obj
 
 
 def get_descriptors(image, keypoints):

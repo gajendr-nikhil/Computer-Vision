@@ -163,10 +163,12 @@ def part_2a(ps5_obj, save_imgs=True):
     part_1c(ps5_obj, False)  # sets up arrays object from last part
 
     # Todo: Define size values to be used in ps5.get_keypoints
-    size = {}
+    size = {"trans_a": 6.0, "trans_b": 6.0,
+            "sim_a": 6.0, "sim_b": 6.0}
 
     # You can leave these values to 0
-    octave = {}
+    octave = {"trans_a": 0, "trans_b": 0,
+              "sim_a": 0, "sim_b": 0}
 
     ps5_obj.compute_angles()
     ps5_obj.create_keypoints(size, octave)
