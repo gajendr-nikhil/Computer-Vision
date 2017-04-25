@@ -1,0 +1,19 @@
+{
+    "tests": [
+        {
+            "output": {
+                "passfail": "passed"
+            },
+            "traceback": "",
+            "description": "Tests B_t (25 points)."
+        },
+        {
+            "output": {
+                "passfail": "passed"
+            },
+            "traceback": "",
+            "description": "Tests central and scaled moments (75 points)."
+        }
+    ],
+    "unauthorized_lib_calls": []
+}
