@@ -135,7 +135,10 @@ def reduce_image(image):
     Returns:
         numpy.array: output image with half the shape, same type as the input image.
     """
-    pass
+    five_tap = np.array([1.0, 4.0, 6.0, 4.0, 1.0]) / 16
+    kernel = np.outer(five_tap, five_tap)
+    filtered_image = cv2.filter2D(image, -1, kernel)
+    return filtered_image[::2, ::2]
 
 
 def gaussian_pyramid(image, levels):
@@ -154,7 +157,13 @@ def gaussian_pyramid(image, levels):
     Returns:
         list: Gaussian pyramid, list of numpy.arrays.
     """
-    pass
+    ret = []
+    ret.append(image)
+    input_img = deepcopy(image)
+    for i in range(1, levels):
+        input_img = reduce_image(input_img)
+        ret.append(input_img)
+    return ret
 
 
 def create_combined_img(img_list):
@@ -170,7 +179,17 @@ def create_combined_img(img_list):
     Returns:
         numpy.array: output image with the pyramid images stacked from left to right.
     """
-    pass
+    rows, cols = img_list[0].shape
+    total_cols = 0
+    for i in range(len(img_list)):
+        total_cols += img_list[i].shape[1]
+    create_combined = np.zeros((rows, int(total_cols)), dtype=np.float64)
+    create_combined[:rows, :cols] = normalize_and_scale(img_list[0])
+    for p in img_list[1:]:
+        n_rows, n_cols = p.shape
+        create_combined[: n_rows, cols : cols + n_cols] = normalize_and_scale(p)
+        cols += n_cols
+    return create_combined
 
 
 def expand_image(image):
