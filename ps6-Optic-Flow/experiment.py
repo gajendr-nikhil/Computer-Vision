@@ -255,7 +255,44 @@ def part_3a_2():
     dtsq2_03 = cv2.imread(os.path.join(input_dir, 'DataSeq2', '2.png'), 0) / 255.
 
     # Todo: Your code here
-    pass
+    #dtsq2_01_blurred = dtsq2_01
+    #dtsq2_02_blurred = dtsq2_02
+    #dtsq2_03_blurred = dtsq2_03
+
+    dtsq2_01_blurred = cv2.GaussianBlur(dtsq2_01, (7, 7), 2)
+    dtsq2_02_blurred = cv2.GaussianBlur(dtsq2_02, (7, 7), 2)
+    dtsq2_03_blurred = cv2.GaussianBlur(dtsq2_03, (7, 7), 2)
+
+    levels = 10
+    level_id = 4
+    k_size = 8
+    k_type = "uniform"
+    sigma = 1
+    interpolation = cv2.INTER_CUBIC
+    border_mode = cv2.BORDER_REFLECT101
+    scale = 2
+    stride = 12
+
+    dtsq2_01_g_pyr = ps6.gaussian_pyramid(dtsq2_01_blurred, levels)
+    dtsq2_02_g_pyr = ps6.gaussian_pyramid(dtsq2_02_blurred, levels)
+    dtsq2_03_g_pyr = ps6.gaussian_pyramid(dtsq2_03_blurred, levels)
+
+    u, v = ps6.optic_flow_lk(dtsq2_01_g_pyr[level_id], dtsq2_02_g_pyr[level_id], k_size, k_type, sigma)
+    u, v = scale_u_and_v(u, v, level_id, dtsq2_02_g_pyr)
+    dtsq2_02_warped = ps6.warp(dtsq2_02_blurred, u, v, interpolation, border_mode)
+    dtsq2_01_02_flow = quiver(u, v, scale, stride)
+    diff_dtsq2_01_02 = dtsq2_01_blurred - dtsq2_02_warped
+    diff_dtsq2_01_02 = cv2.GaussianBlur(diff_dtsq2_01_02, (7, 7), 2)
+
+    u, v = ps6.optic_flow_lk(dtsq2_02_g_pyr[level_id], dtsq2_03_g_pyr[level_id], k_size, k_type, sigma)
+    u, v = scale_u_and_v(u, v, level_id, dtsq2_03_g_pyr)
+    dtsq2_03_warped = ps6.warp(dtsq2_03_blurred, u, v, interpolation, border_mode)
+    dtsq2_02_03_flow = quiver(u, v, scale, stride)
+    diff_dtsq2_02_03 = dtsq2_02_blurred - dtsq2_03_warped
+    diff_dtsq2_02_03 = cv2.GaussianBlur(diff_dtsq2_02_03, (7, 7), 2)
+
+    cv2.imwrite(os.path.join(output_dir, "ps6-3-a-3.png"), np.concatenate((dtsq2_01_02_flow, dtsq2_02_03_flow), axis=0))
+    cv2.imwrite(os.path.join(output_dir, "ps6-3-a-4.png"), np.concatenate((ps6.normalize_and_scale(diff_dtsq2_01_02), ps6.normalize_and_scale(diff_dtsq2_02_03)), axis=0))
 
 def part_4a():
     shift_0 = cv2.imread(os.path.join(input_dir, 'TestSeq', 'Shift0.png'), 0) / 255.
