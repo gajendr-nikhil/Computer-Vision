@@ -51,6 +51,27 @@ class ParticleFilter(object):
         # The way to do it is:
         # self.some_parameter_name = kwargs.get('parameter_name', default_value)
 
+        self.template = template
+        self.frame = frame
+
+        # Todo: Initialize your particles array. Read the docstring.
+        self.nxpart = 1
+        self.particles = np.zeros((self.nxpart * self.num_particles, 2))
+        # Todo: Initialize your weights array. Read the docstring.
+        self.weights = np.ones(self.nxpart * self.num_particles, dtype=np.float64) / (self.nxpart * self.num_particles)
+
+        # Initialize any other components you may need when designing your filter.
+        self.frame_number = 0
+        self.ty, self.tx = self.template.shape[: 2]
+        self.fy, self.fx = self.frame.shape[: 2]
+        self.hy, self.wx = int(round((self.ty -1)/2)), int(round((self.tx -1)/2))
+        self.scenter = (self.template_rect['y'] + self.hy, self.template_rect['x'] + self.wx)
+        self.stWin = 150
+        self.xf = np.array([np.random.choice(np.arange(self.scenter[0]-self.stWin,  self.scenter[0]+self.stWin), self.nxpart * self.num_particles, replace=True),
+                            np.random.choice(np.arange(self.scenter[1]-self.stWin,  self.scenter[1]+self.stWin), self.nxpart * self.num_particles, replace=True)])
+
+        self.gray_t = cv2.cvtColor(self.template, cv2.COLOR_BGR2GRAY).astype(np.float32)
+
     def get_particles(self):
         """Returns the current particles state.
 
@@ -89,8 +110,49 @@ class ParticleFilter(object):
         Returns:
             None.
         """
-        pass
+        if self.frame_number <= 9:
+            nump = self.nxpart * self.num_particles
+        else:
+            nump = self.num_particles
+        xf_new = np.zeros_like(self.xf)
+        w_new = np.copy(self.weights)
+        for i in range(nump):
+            sample = self.xf[:, np.random.choice(np.arange(nump), 1, replace=True, p=self.weights)[0]]
+            while True:
+                rnum = int(np.random.randn() * self.sigma_dyn + self.sigma_dyn/2.0)
+                if (sample[1] + rnum) < int(self.template_rect['w'] // 2):
+                    xf_new[:, i][1] = int(self.template_rect['w'] // 2)
+                elif (sample[1] + rnum) >= int(self.fx - self.template_rect['w'] // 2):
+                    xf_new[:, i][1] = int(self.fx - self.template_rect['w'] // 2)
+                else:
+                    xf_new[:, i][1] = (sample[1] + rnum)
+                rnum = int(np.random.randn() * self.sigma_dyn + self.sigma_dyn/2.0)
+                if (sample[0] + rnum) < int(self.template_rect['h'] // 2):
+                    xf_new[:, i][0] = int(self.template_rect['h'] // 2)
+                elif (sample[0] + rnum) >= int(self.fy - self.template_rect['h'] // 2):
+                    xf_new[:, i][0] = int(self.fy - self.template_rect['h'] // 2)
+                else:
+                    xf_new[:, i][0] = (sample[0] + rnum)
+                break
+            self.particles[i] = xf_new[:, i]
 
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY).astype(np.float64)
+
+            patch = gray[xf_new[:, i][0] - self.hy -1 : xf_new[:, i][0] + self.hy + 1, xf_new[:, i][1] - self.wx -1 : xf_new[:, i][1] + self.wx + 1]
+
+            mse = np.mean(np.square(self.gray_t - patch), dtype=np.float64)
+
+            w_new[i] = np.exp(-mse / (2 * self.sigma_exp))
+
+        self.xf = xf_new
+        self.weights = np.copy(w_new)
+        if np.sum(self.weights) > 0.0:
+            self.weights = self.weights / np.sum(self.weights)
+        else:
+            self.weights = np.ones(nump, dtype=np.float64) / (nump)
+
+        self.frame_number += 1
+        #print "frame number... %s" %self.frame_number
 
     def render(self, frame_in):
         """Visualizes current particle filter state.
@@ -116,7 +178,16 @@ class ParticleFilter(object):
         Args:
             frame_in (numpy.array): copy of frame to render the state of the particle filter.
         """
-        pass
+        u_weighted_mean = 0
+        v_weighted_mean = 0
+
+        for i in range(self.num_particles):
+            u_weighted_mean += self.particles[i, 0] * self.weights[i]
+            v_weighted_mean += self.particles[i, 1] * self.weights[i]
+            cv2.circle(frame_in, (int(self.particles[i, 1]), int(self.particles[i, 0])), 2, (0,255,0), -1)
+        top_left = int(v_weighted_mean - self.template_rect['w'] // 2), int(u_weighted_mean - self.template_rect['h'] // 2)
+        bottom_right = int(v_weighted_mean + self.template_rect['w'] // 2), int(u_weighted_mean + self.template_rect['h'] // 2)
+        cv2.rectangle(frame_in, top_left, bottom_right, (255,0,0), 2)
 
 
 class AppearanceModelPF(ParticleFilter):
