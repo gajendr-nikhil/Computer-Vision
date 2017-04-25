@@ -17,7 +17,12 @@ def gradient_x(image):
     Returns:
         numpy.array: image gradient in X direction with values in [-1.0, 1.0].
     """
-    pass
+    gradient = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=5)
+    gmax, gmin = gradient.max(), gradient.min()
+    maxidx, minidx = gradient >= 0, gradient < 0
+    gradient[maxidx] /= gmax
+    gradient[minidx] /= (gmin if gmin > 0 else -gmin)
+    return gradient
 
 
 def gradient_y(image):
@@ -31,7 +36,12 @@ def gradient_y(image):
     Returns:
         numpy.array: image gradient in Y direction with values in [-1.0, 1.0].
     """
-    pass
+    gradient = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=5)
+    gmax, gmin = gradient.max(), gradient.min()
+    maxidx, minidx = gradient >= 0, gradient < 0
+    gradient[maxidx] /= gmax
+    gradient[minidx] /= (gmin if gmin > 0 else -gmin)
+    return gradient
 
 
 def make_image_pair(image1, image2):
@@ -49,7 +59,7 @@ def make_image_pair(image1, image2):
     Returns:
         numpy.array: combination of both images, side-by-side, same type as the input size.
     """
-    pass
+    return np.hstack((image1, image2))
 
 
 def harris_response(ix, iy, kernel_dims, alpha):
