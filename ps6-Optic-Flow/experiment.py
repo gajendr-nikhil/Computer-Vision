@@ -485,7 +485,45 @@ def part_5a():
 
     # Todo: Your code here
 
-    pass
+    juggle_01 = cv2.GaussianBlur(juggle_01, (7, 7), 2)
+    juggle_02 = cv2.GaussianBlur(juggle_02, (7, 7), 2)
+    juggle_03 = cv2.GaussianBlur(juggle_03, (7, 7), 2)
+
+    # Todo: Your code here
+    levels = 15
+    k_size = 20
+    k_type = "uniform"
+    sigma = 1
+    interpolation = cv2.INTER_CUBIC
+    border_mode = cv2.BORDER_REFLECT101
+    scale = 2
+    stride = 12
+
+    uyos02, vyos02 = ps6.hierarchical_lk(juggle_01, juggle_02, levels, k_size, k_type, sigma, interpolation, border_mode)
+    jet_uyos02_vyos02 = jet_colormaps(uyos02, vyos02)
+    jet_uyos02_vyos02_flow = quiver(uyos02, vyos02, scale, stride)
+
+    # You may want to try different parameters for the remaining function calls.
+    uyos03, vyos03 = ps6.hierarchical_lk(juggle_01, juggle_03, levels, k_size, k_type, sigma, interpolation, border_mode)
+    jet_uyos03_vyos03 = jet_colormaps(uyos03, vyos03)
+    jet_uyos03_vyos03_flow = quiver(uyos03, vyos03, scale, stride)
+
+    jets_stacked = np.concatenate((jet_uyos02_vyos02, jet_uyos03_vyos03), axis=0)
+    cv2.imwrite(os.path.join(output_dir, "ps6-5-a-1.png"), jets_stacked)
+
+    # Save difference between each warped image and original image (Shift0), stacked
+    yos_img_02_warped = ps6.warp(juggle_02, uyos02, vyos02, interpolation, border_mode)
+    yos_img_03_warped = ps6.warp(juggle_03, uyos03, vyos03, interpolation, border_mode)
+
+    diff_1_2 = yos_img_02_warped - juggle_01
+    diff_1_3 = yos_img_03_warped - juggle_01
+
+    diff_stacked = np.concatenate((ps6.normalize_and_scale(diff_1_2),
+                                   ps6.normalize_and_scale(diff_1_3)),
+                                  axis=0)
+    cv2.imwrite(os.path.join(output_dir, "ps6-5-a-2.png"), diff_stacked)
+
+    cv2.imwrite(os.path.join(output_dir, "ps6-5-a-3.png"), np.concatenate((jet_uyos02_vyos02_flow, jet_uyos03_vyos03_flow), axis=0))
 
 
 if __name__ == "__main__":
