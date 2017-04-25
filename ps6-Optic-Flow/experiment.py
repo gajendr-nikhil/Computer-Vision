@@ -130,6 +130,27 @@ def part_1b():
     shift_r40 = cv2.imread(os.path.join(input_dir, 'TestSeq', 'ShiftR40.png'), 0) / 255.
 
     # Todo: Your code here
+
+    shift_0_blurred = cv2.GaussianBlur(shift_0, (7, 7), 2)
+    shift_r10_blurred = cv2.GaussianBlur(shift_r10, (7, 7), 2)
+    shift_r20_blurred = cv2.GaussianBlur(shift_r20, (7, 7), 2)
+    shift_r40_blurred = cv2.GaussianBlur(shift_r40, (7, 7), 2)
+
+    k_size = 8  # Select a kernel size
+    k_type = "uniform"  # Select a kernel type
+    sigma = 1  # Select a sigma value if you are using a gaussian kernel
+
+    u, v = ps6.optic_flow_lk(shift_0_blurred, shift_r10_blurred, k_size, k_type, sigma)
+    u_v = jet_colormaps(u, v)
+    cv2.imwrite(os.path.join(output_dir, "ps6-1-b-1.png"), u_v)
+
+    u, v = ps6.optic_flow_lk(shift_0_blurred, shift_r20_blurred, k_size, k_type, sigma)
+    u_v = jet_colormaps(u, v)
+    cv2.imwrite(os.path.join(output_dir, "ps6-1-b-2.png"), u_v)
+
+    u, v = ps6.optic_flow_lk(shift_0_blurred, shift_r40_blurred, k_size, k_type, sigma)
+    u_v = jet_colormaps(u, v)
+    cv2.imwrite(os.path.join(output_dir, "ps6-1-b-3.png"), u_v)
     pass
 
 
