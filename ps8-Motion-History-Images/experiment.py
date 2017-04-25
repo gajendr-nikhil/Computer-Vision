@@ -189,9 +189,9 @@ def part_1a():
 
 def part_1b_1():
     filename = "PS8A1P1T1.mp4"  # Use Action 1. You may choose a different Person and Trial.
-    mhi_frame = 90  # Pick a good frame to obtain MHI at, i.e. when action just ends
-    theta = 0.  # Define a value for theta
-    tau = 0.  # Define a value for theta
+    mhi_frame = 55  # Pick a good frame to obtain MHI at, i.e. when action just ends
+    theta = 2.5
+    tau = mhi_frame
     build_motion_history_image(MotionHistoryBuilder,  # motion history builder class
                                os.path.join(input_dir, filename),
                                mhi_frame=mhi_frame,
@@ -213,8 +213,30 @@ def part_1b_2():
         None
     """
 
-    # TODO: Your code here
-    pass
+    filename = "PS8A2P1T1.mp4"  # Use Action 1. You may choose a different Person and Trial.
+    mhi_frame = 32  # Pick a good frame to obtain MHI at, i.e. when action just ends
+    theta = 2.5
+    tau = mhi_frame
+    build_motion_history_image(MotionHistoryBuilder,  # motion history builder class
+                               os.path.join(input_dir, filename),
+                               mhi_frame=mhi_frame,
+                               mhi_filename=os.path.join(output_dir, 'ps8-1-b-2.png'),
+                               theta=theta,
+                               tau=tau
+                               )
+
+
+    filename = "PS8A3P1T1.mp4"  # Use Action 1. You may choose a different Person and Trial.
+    mhi_frame = 45  # Pick a good frame to obtain MHI at, i.e. when action just ends
+    theta = 2.5
+    tau = mhi_frame
+    build_motion_history_image(MotionHistoryBuilder,  # motion history builder class
+                               os.path.join(input_dir, filename),
+                               mhi_frame=mhi_frame,
+                               mhi_filename=os.path.join(output_dir, 'ps8-1-b-3.png'),
+                               theta=theta,
+                               tau=tau
+                               )
 
 
 def part_2a():

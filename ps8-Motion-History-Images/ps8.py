@@ -59,7 +59,7 @@ class MotionHistoryBuilder(object):
         B_t[idx] = 1
         return B_t
 
-    def process(self, frame):
+    def process(self, frame, ke=(13, 13), kd=(20, 20)):
         """Processes a frame of video returning a binary image indicating motion areas.
 
         This method takes care of computing the B_t(x, y, t) and M_tau(x, y, t) as shown in the problem set
@@ -90,8 +90,34 @@ class MotionHistoryBuilder(object):
             (numpy.array): binary image final B_t (type: bool or uint8), values: 0 (static) or 1 (moving).
 
         """
+        # import pdb; pdb.set_trace()
+        kernele = np.ones(ke, np.uint8)
+        kerneld = np.ones(kd, np.uint8)
+        gray = cv2.GaussianBlur(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), (5, 5), 0)
 
-        pass
+        gray_clean = gray
+
+
+        if self.I_t_1 is None:
+            self.I_t_1 = gray_clean
+            return np.zeros_like(gray_clean)
+
+        B_t = self.get_b_t(gray_clean, self.I_t_1)
+        self.I_t_1 = gray_clean
+
+        erosion = cv2.erode(B_t, kernele, iterations = 1)
+        final_B_t = cv2.dilate(erosion, kerneld, iterations = 1)
+
+        idx1 = np.where(final_B_t == 1.0)
+        idx0 = np.where(final_B_t == 0.0)
+
+        self.mhi[idx1] = self.tau
+
+        self.mhi[idx0] -= 1
+        idx_1 = np.where(self.mhi < 0.0)
+        self.mhi[idx_1] = 0
+
+        return final_B_t
 
     def get_mhi(self):
         """Returns the motion history image computed so far.
