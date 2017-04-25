@@ -19,7 +19,10 @@ def normalize_and_scale(image_in, scale_range=(0, 255)):
     Returns:
         numpy.array: output image (uint8).
     """
-    pass
+    image_out = np.zeros(image_in.shape)
+    cv2.normalize(image_in, image_out, alpha=scale_range[0], beta=scale_range[1], norm_type=cv2.NORM_MINMAX)
+
+    return image_out
 
 
 # Assignment code
@@ -35,7 +38,7 @@ def gradient_x(image):
     Returns:
         numpy.array: image gradient in the X direction. Output from cv2.Sobel.
     """
-    pass
+    return cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3, scale=1.0/8)
 
 
 def gradient_y(image):
@@ -50,7 +53,7 @@ def gradient_y(image):
     Returns:
         numpy.array: image gradient in the Y direction. Output from cv2.Sobel.
     """
-    pass
+    return cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=3, scale=1.0/8)
 
 
 def optic_flow_lk(img_a, img_b, k_size, k_type, sigma=1):
@@ -80,10 +83,39 @@ def optic_flow_lk(img_a, img_b, k_size, k_type, sigma=1):
                              type.
             V (numpy.array): raw displacement (in pixels) along Y-axis, same size and type as U.
     """
-    pass
+    #import pdb;pdb.set_trace()
+    if k_type == 'uniform':
+        # Generate a uniform kernel. The autograder uses this flag.
+        kernel = np.ones((k_size, k_size), np.float64) / (k_size ** 2)
+    elif k_type == 'gaussian':
+        # Generate a gaussian kernel. This flag is not tested but may yield better results in some images.
+        kernel = cv2.getGaussianKernel(k_size, sigma)#, cv2.CV_32f)
+        pass
+
+    # Place your LK code here.
+    ix = gradient_x(img_a)
+    iy = gradient_y(img_a)
+    it = img_b - img_a
+
+    sixx = cv2.filter2D(np.square(ix), -1, kernel)
+    siyy = cv2.filter2D(np.square(iy), -1, kernel)
+    sixy = cv2.filter2D(ix * iy, -1, kernel)
+    sixt = cv2.filter2D(ix * it, -1, kernel)
+    siyt = cv2.filter2D(iy * it, -1, kernel)
+
+    detA = sixx * siyy - sixy * sixy
+    zeroidx = np.where(detA <= 0.0)
+    detA[zeroidx] = float('inf')
+
+    U = (siyy * -sixt + -sixy * -siyt) / detA
+    V = (-sixy * -sixt + sixx * -siyt) / detA
+
+    return U, V
 
 def padwithzeros(vector, pad_width, iaxis, kwargs):
-    pass
+    vector[:pad_width[0]] = 0
+    vector[-pad_width[1]:] = 0
+    return vector
 
 def reduce_image(image):
     """Reduces an image to half its shape.
