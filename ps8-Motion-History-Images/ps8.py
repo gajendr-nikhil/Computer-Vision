@@ -130,7 +130,7 @@ class MotionHistoryBuilder(object):
         """
 
         # Note: This method may not be called for every frame (typically, only once)
-        return self.mhi
+        return self.mhi / np.max(self.mhi)
 
 
 class Moments(object):

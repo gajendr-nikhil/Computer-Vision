@@ -54,9 +54,12 @@ def build_motion_history_image(builder_class, video_filename, save_frames={}, mh
                 mhi_builder = builder_class(frame, **kwargs)
 
             # Process frame
-            motion_image = mhi_builder.process(frame)
+            if not kwargs.get('ke', None) or not kwargs.get('kd', None):
+                motion_image = mhi_builder.process(frame)
+            else:
+                motion_image = mhi_builder.process(frame, kwargs['ke'], kwargs['kd'])
 
-            if False:  # For debugging, it shows every frame
+            if True:  # For debugging, it shows every frame
                 out_frame = motion_image.copy()
                 cv2.imshow('frame', 1. * out_frame)
                 cv2.waitKey(1)  # Set to 0 if you want to continue by pressing any key
@@ -73,6 +76,9 @@ def build_motion_history_image(builder_class, video_filename, save_frames={}, mh
 
             # Update frame number
             frame_num += 1
+            # print("frame number =", frame_num)
+            # if frame_num >= 28:
+            #     import pdb;pdb.set_trace()
         except KeyboardInterrupt:  # press ^C to quit
             break
 
@@ -133,7 +139,7 @@ def get_cs_moment_features(n_actions, n_participants, n_trials, default_params, 
     return c_moment_features, s_moment_features
 
 
-def match_features(a_features_dict, b_features_dict, n_actions, scale=0.5):
+def match_features(a_features_dict, b_features_dict, n_actions, scale=0.50):
     """Compares features, tally matches for each action pair to produce a confusion matrix.
 
     Do not modify this function. You may uncomment the debug line when you are working on your assignment. Make sure
@@ -161,7 +167,7 @@ def match_features(a_features_dict, b_features_dict, n_actions, scale=0.5):
                 min_diff = diff
                 best_match = b_key
         if best_match is not None:
-            # print("{} matches {}, diff: {}".format(a_key, best_match, min_diff))  # [debug]
+            print("{} matches {}, diff: {}".format(a_key, best_match, min_diff))  # [debug]
             confusion_matrix[a_key[0] - 1, best_match[0] - 1] += 1  # note: 1-based to 0-based indexing
 
     confusion_matrix /= confusion_matrix.sum(axis=1)[:, np.newaxis]  # normalize confusion_matrix along each row
@@ -237,6 +243,7 @@ def part_1b_2():
                                theta=theta,
                                tau=tau
                                )
+
 
 
 def part_2a():
@@ -319,7 +326,45 @@ def part_2b():
     print(confusion_p1)
 
     # TODO: Similarly for participants P2 & P3
+    person = 2
+    n_actions = 3
+    scale = 0.5  # Select a different scale factor (if needed) to help obtain an identity confusion matrix
+    features = central_moment_features  # Pick one between central_moment_features and scaled_moment_features
+    features_p2 = {key: feature for key, feature in features.items() if key[1] == person}
+    features_sans_p2 = {key: feature for key, feature in features.items() if key[1] != person}
+    confusion_p2 = match_features(features_p2, features_sans_p2, n_actions, scale)
+    print("Confusion matrix for P{}:-".format(person))
+    print(confusion_p2)
+
+    person = 3
+    n_actions = 3
+    scale = 0.5  # Select a different scale factor (if needed) to help obtain an identity confusion matrix
+    features = central_moment_features  # Pick one between central_moment_features and scaled_moment_features
+    features_p3 = {key: feature for key, feature in features.items() if key[1] == person}
+    features_sans_p3 = {key: feature for key, feature in features.items() if key[1] != person}
+    confusion_p3 = match_features(features_p3, features_sans_p3, n_actions, scale)
+    print("Confusion matrix for P{}:-".format(person))
+    print(confusion_p3)
     # TODO: Finally find the Average confusion matrix of P1, P2, and P3
+
+    print("Average confusion matrix: ")
+    print((confusion_p1 + confusion_p2 + confusion_p3) / 3.0)
+
+def test():
+
+    theta = 25.0
+    tau = 255
+
+    a, p, t = (3, 3, 3)
+    filename = os.path.join(input_dir, "PS8A{}P{}T{}.mp4".format(a, p, t))
+    print(filename)
+    build_motion_history_image(MotionHistoryBuilder,
+                                           filename,
+                                           theta=theta,
+                                           tau=tau,
+                                           ke=(8, 8),
+                                           kd=(8, 8)
+                                          )
 
 if __name__ == "__main__":
     part_1a()
@@ -327,3 +372,4 @@ if __name__ == "__main__":
     part_1b_2()
     part_2a()
     part_2b()
+    # test()
