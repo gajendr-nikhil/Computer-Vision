@@ -154,6 +154,37 @@ class Moments(object):
         # Compute all desired moments here (recommended)
         # Note: Make sure computed moments are in correct order
 
+        # import pdb;pdb.set_trace()
+        row, col = image.shape[:2]
+        x, y = np.meshgrid(np.arange(col), np.arange(row))
+
+        M10 = np.sum((x ** 1) * image) * 1.0
+        M01 = np.sum((y ** 1) * image) * 1.0
+        M00 = np.sum(image) * 1.0
+        xbar = M10 / M00
+        ybar = M01 / M00
+
+        mu00 = np.sum(image) * 1.0
+        self.central_moments[0][0] = np.sum(((x - xbar) ** 2) * ((y - ybar) ** 0) * image) * 1.0
+        self.central_moments[0][1] = np.sum(((x - xbar) ** 1) * ((y - ybar) ** 1) * image) * 1.0
+        self.central_moments[0][2] = np.sum(((x - xbar) ** 0) * ((y - ybar) ** 2) * image) * 1.0
+        self.central_moments[0][3] = np.sum(((x - xbar) ** 3) * ((y - ybar) ** 0) * image) * 1.0
+        self.central_moments[0][4] = np.sum(((x - xbar) ** 2) * ((y - ybar) ** 1) * image) * 1.0
+        self.central_moments[0][5] = np.sum(((x - xbar) ** 1) * ((y - ybar) ** 2) * image) * 1.0
+        self.central_moments[0][6] = np.sum(((x - xbar) ** 0) * ((y - ybar) ** 3) * image) * 1.0
+        self.central_moments[0][7] = np.sum(((x - xbar) ** 2) * ((y - ybar) ** 2) * image) * 1.0
+
+        self.scaled_moments[0][0] =  (self.central_moments[0][0] / (mu00 ** (1 + (2 + 0) / 2.0))) * 1.0
+        self.scaled_moments[0][1] =  (self.central_moments[0][1] / (mu00 ** (1 + (1 + 1) / 2.0))) * 1.0
+        self.scaled_moments[0][2] =  (self.central_moments[0][2] / (mu00 ** (1 + (0 + 2) / 2.0))) * 1.0
+        self.scaled_moments[0][3] =  (self.central_moments[0][3] / (mu00 ** (1 + (3 + 0) / 2.0))) * 1.0
+        self.scaled_moments[0][4] =  (self.central_moments[0][4] / (mu00 ** (1 + (2 + 1) / 2.0))) * 1.0
+        self.scaled_moments[0][5] =  (self.central_moments[0][5] / (mu00 ** (1 + (1 + 2) / 2.0))) * 1.0
+        self.scaled_moments[0][6] =  (self.central_moments[0][6] / (mu00 ** (1 + (0 + 3) / 2.0))) * 1.0
+        self.scaled_moments[0][7] =  (self.central_moments[0][7] / (mu00 ** (1 + (2 + 2) / 2.0))) * 1.0
+
+        # import pdb;pdb.set_trace()
+
     def get_central_moments(self):
         """Returns the central moments as NumPy array.
 
@@ -183,7 +214,7 @@ class Moments(object):
         return self.scaled_moments
 
 
-def compute_feature_difference(a_features, b_features, scale=0.5):
+def compute_feature_difference(a_features, b_features, scale=0.50):
     """Computes feature difference between two videos.
 
     This function is called by the method match_features located in experiment.py. The features used are the dictionary
@@ -206,4 +237,4 @@ def compute_feature_difference(a_features, b_features, scale=0.5):
     """
 
     # Tip: Scale/weight difference values to get better results as moment magnitudes differ
-    pass
+    return np.sqrt(np.sum(np.square(scale * a_features - (1 - scale) * b_features)))

@@ -246,15 +246,40 @@ def part_2a():
     # Compute MHI and MEI features (unscaled and scaled central moments) for each video
 
     # Parameters for build_motion_history(), overridden by custom_params for specified videos
-    default_params = dict(mhi_frame=60)
+    default_params = dict(mhi_frame=60, theta = 2.5, tau = 60)
 
     # Note: To specify custom parameters for a video, add to the dict below:
     #   (<action>, <participant>, <trial>): dict(<param1>=<value1>, <param2>=<value2>, ...)
     custom_params = {
-        (1, 1, 3): dict(mhi_frame=90),  # PS8A1P1T3.mp4 Reference value you may use a different one
-        (1, 2, 3): dict(mhi_frame=55)  # PS8A1P2T3.mp4 Reference value you may use a different one
-        # You can add more if needed up to one for each video following the format:
-        # (1, 3, 4): dict(mhi_frame=value1, theta=value2, tau=value3)
+        (1, 1, 1): dict(mhi_frame=60, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (1, 1, 2): dict(mhi_frame=48, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (1, 1, 3): dict(mhi_frame=54, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (1, 2, 1): dict(mhi_frame=34, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (1, 2, 2): dict(mhi_frame=30, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (1, 2, 3): dict(mhi_frame=35, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (1, 3, 1): dict(mhi_frame=43, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (1, 3, 2): dict(mhi_frame=43, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (1, 3, 3): dict(mhi_frame=40, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+
+        (2, 1, 1): dict(mhi_frame=25, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (2, 1, 2): dict(mhi_frame=30, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (2, 1, 3): dict(mhi_frame=34, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (2, 2, 1): dict(mhi_frame=20, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (2, 2, 2): dict(mhi_frame=23, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (2, 2, 3): dict(mhi_frame=20, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (2, 3, 1): dict(mhi_frame=23, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (2, 3, 2): dict(mhi_frame=25, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (2, 3, 3): dict(mhi_frame=28, theta = 5.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+
+        (3, 1, 1): dict(mhi_frame=46, theta = 0.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (3, 1, 2): dict(mhi_frame=40, theta = 0.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (3, 1, 3): dict(mhi_frame=40, theta = 0.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (3, 2, 1): dict(mhi_frame=28, theta = 0.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (3, 2, 2): dict(mhi_frame=28, theta = 0.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (3, 2, 3): dict(mhi_frame=28, theta = 0.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (3, 3, 1): dict(mhi_frame=28, theta = 0.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (3, 3, 2): dict(mhi_frame=36, theta = 0.0, tau = 100, ke=(12, 12), kd=(12, 12)),
+        (3, 3, 3): dict(mhi_frame=29, theta = 0.0, tau = 100, ke=(12, 12), kd=(12, 12)),
     }
 
     n_actions = 3
