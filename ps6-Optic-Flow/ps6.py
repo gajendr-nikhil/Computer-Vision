@@ -208,7 +208,12 @@ def expand_image(image):
         numpy.array: same type as 'image' with the doubled height and width.
     """
     #import pdb;pdb.set_trace()
-    pass
+    C = np.zeros((image.shape[0] * 2, image.shape[1] * 2))
+    C[::2, ::2] = image
+    five_tap = np.array([1.0, 4.0, 6.0, 4.0, 1.0]) / 8
+    kernel = np.outer(five_tap, five_tap)
+    filtered_image = cv2.filter2D(C, -1, kernel)
+    return filtered_image
 
 
 def laplacian_pyramid(g_pyr):
@@ -222,7 +227,18 @@ def laplacian_pyramid(g_pyr):
     Returns:
         list: Laplacian pyramid, with l_pyr[-1] = g_pyr[-1].
     """
-    pass
+    l_pyr = []
+    l_pyr.append(g_pyr[-1])
+    for i in range(len(g_pyr) - 1, 0, -1):
+        oim = g_pyr[i - 1]
+        eim = expand_image(g_pyr[i])
+        e_row, e_col = eim.shape
+        if e_row == oim.shape[0] + 1:
+            e_row -= 1
+        if e_col == oim.shape[1] + 1:
+            e_col -= 1
+        l_pyr.append((oim - eim[: e_row, : e_col]))
+    return l_pyr[::-1]
 
 
 def warp(image, U, V, interpolation, border_mode):
