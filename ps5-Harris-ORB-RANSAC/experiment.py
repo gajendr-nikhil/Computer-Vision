@@ -134,10 +134,12 @@ def part_1c(ps5_obj, save_imgs=True):
     part_1b(ps5_obj, False)  # sets up arrays object from last part
 
     # Todo: Define the threshold values dimensions for each image (float)
-    threshold = {}
+    threshold = {"trans_a": 0.5, "trans_b": 0.4,
+                 "sim_a": 0.4, "sim_b": 0.4}
 
     # Todo: Define the radius values for each image (int)
-    radius = {}
+    radius = {"trans_a": 6, "trans_b": 6,
+              "sim_a": 6, "sim_b": 6}
 
     ps5_obj.find_corners(threshold, radius)
 

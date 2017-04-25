@@ -104,7 +104,31 @@ def find_corners(r_map, threshold, radius):
     """
 
     # Normalize R
-    pass
+    r_map_norm = cv2.normalize(r_map, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+    idx = np.where(r_map_norm < threshold)
+    r_map_norm[idx] = 0.0
+    points = []
+
+    #'''
+    max_x = len(r_map_norm)
+    max_y = len(r_map_norm[0])
+    theta = np.linspace(0, 2*np.pi, 8192)
+    
+    for i in range(0, max_x):
+        for j in range(0, max_y):
+            if r_map_norm[i][j] <= 0:
+                continue
+            r = radius
+            while r > 1:
+                xy = np.array(list(set([xy for xy in zip( (r * np.cos(theta) + i).astype(int), (r * np.sin(theta) + j).astype(int)) if xy[0] >= 0 and xy[0] < max_x and xy[1] >= 0 and xy[1] < max_y])))
+                r -= 1
+                r_map_norm[(xy[:, 0], xy[:, 1])] = 0.0
+                #for x,y in xy:
+                #    r_map_norm[x][y] = 0.0
+    #'''
+    x, y = np.where(r_map_norm >= threshold)
+    #import pdb;pdb.set_trace()
+    return np.vstack((y, x)).T
 
 
 def draw_corners(image, corners):
@@ -118,7 +142,10 @@ def draw_corners(image, corners):
     Returns:
         numpy.array: copy of the input image with corners drawn on it, in color (BGR).
     """
-    pass
+    img = cv2.cvtColor(np.uint8(image * 255.0), cv2.COLOR_GRAY2BGR)
+    for x, y in corners:
+        cv2.circle(img, (x, y), 3, (0, 0, 255), -1)
+    return img
 
 
 def gradient_angle(ix, iy):
