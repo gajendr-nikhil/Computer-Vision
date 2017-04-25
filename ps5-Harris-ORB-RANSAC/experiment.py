@@ -87,6 +87,22 @@ def draw_consensus_set(good_matches, image_pair, image_a_shape, kp1=None, kp2=No
     # Start by normalizing the r_map setting its values to a range in [0, 255] and convert it to BGR
 
     # Todo: Your code here.
+    image_pair = cv2.cvtColor(np.uint8(cv2.normalize(image_pair, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX) * 255.0), cv2.COLOR_GRAY2BGR)
+    list_kp1 = []
+    list_kp2 = []
+    for mat in good_matches:
+        img1_idx = mat.queryIdx
+        img2_idx = mat.trainIdx
+        (x1,y1) = tuple(map(int, kp1[img1_idx].pt))
+        (x2,y2) = tuple(map(int, kp2[img2_idx].pt))
+        cv2.circle(image_pair, (x1, y1), 3, (0, 0, 255), -1)
+        cv2.circle(image_pair, (image_a_shape[1] + x2, y2), 3, (0, 0, 255), -1)
+        list_kp1.append((x1, y1))
+        list_kp2.append(((image_a_shape[1]) + x2, y2))
+
+    for i in range(len(list_kp1)):
+        cv2.line(image_pair, list_kp1[i], list_kp2[i], (0,0,255), 1)
+    return image_pair
 
 
 def part_1a(ps5_obj, save_imgs=True):

@@ -296,7 +296,26 @@ def compute_translation_RANSAC(kp1, kp2, matches, thresh):
     # (i.e. brute-force) you will not get credit for either the autograder tests or the report
     # sections that depend of this function.
 
-    pass
+    N, sample_count = float('inf'), 0.0
+    best_consensus, best_delta, best_n = [], np.zeros((2, 1)), 0
+    while N > sample_count:
+        consensus, inliers = [], 0
+        indx = random.randint(0, len(matches) -1)
+        delta = np.asarray(kp2[matches[indx].trainIdx].pt) - np.asarray(kp1[matches[indx].queryIdx].pt)
+        for i, mat in enumerate(matches):
+            if i == indx:
+                continue
+            dt = np.asarray(kp2[mat.trainIdx].pt) - np.asarray(kp1[mat.queryIdx].pt)
+            if np.sqrt(np.sum((delta - dt) ** 2)) <= 2 * thresh:
+                consensus.append(mat)
+                inliers += 1
+        if inliers > best_n:
+            best_n = inliers
+            best_delta = np.resize(delta, (2, 1))
+            best_consensus = deepcopy(consensus)
+            N = np.log(1 - 0.99) / np.log(1 - (1 - (1 - (inliers / len(matches)))) ** 1)
+        sample_count += 1
+    return best_delta, best_consensus
 
 
 def compute_similarity_RANSAC(kp1, kp2, matches, thresh):
