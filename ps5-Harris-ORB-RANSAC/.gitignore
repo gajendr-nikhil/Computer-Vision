@@ -1,0 +1,5 @@
+.idea/
+*~
+*.pyc
+.bonnie
+.DS_Store

@@ -80,6 +80,7 @@ def harris_response(ix, iy, kernel_dims, alpha):
     trace = sixx + sixy
     det = sixx * siyy - sixy * sixy
     return (det - alpha * trace)
+    pass
 
 
 def find_corners(r_map, threshold, radius):
@@ -129,6 +130,7 @@ def find_corners(r_map, threshold, radius):
     x, y = np.where(r_map_norm >= threshold)
     #import pdb;pdb.set_trace()
     return np.vstack((y, x)).T
+    pass
 
 
 def draw_corners(image, corners):
@@ -316,6 +318,7 @@ def compute_translation_RANSAC(kp1, kp2, matches, thresh):
             N = np.log(1 - 0.99) / np.log(1 - (1 - (1 - (inliers / len(matches)))) ** 1)
         sample_count += 1
     return best_delta, best_consensus
+    pass
 
 
 def compute_similarity_RANSAC(kp1, kp2, matches, thresh):
