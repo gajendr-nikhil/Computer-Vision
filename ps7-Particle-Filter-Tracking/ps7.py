@@ -222,7 +222,58 @@ class AppearanceModelPF(ParticleFilter):
         Returns:
             None.
         """
-        pass
+        if self.frame_number <= 9:
+            nump = self.nxpart * self.num_particles
+        else:
+            nump = self.num_particles
+        xf_new = np.zeros_like(self.xf)
+        w_new = np.copy(self.weights)
+        for i in range(nump):
+            sample = self.xf[:, np.random.choice(np.arange(nump), 1, replace=True, p=self.weights)[0]]
+            while True:
+                rnum = int(np.random.randn() * self.sigma_dyn + self.sigma_dyn/2.0)
+                if (sample[1] + rnum) < int(self.template_rect['w'] // 2):
+                    xf_new[:, i][1] = int(self.template_rect['w'] // 2)
+                elif (sample[1] + rnum) >= int(self.fx - self.template_rect['w'] // 2):
+                    xf_new[:, i][1] = int(self.fx - self.template_rect['w'] // 2)
+                else:
+                    xf_new[:, i][1] = (sample[1] + rnum)
+                rnum = int(np.random.randn() * self.sigma_dyn + self.sigma_dyn/2.0)
+                if (sample[0] + rnum) < int(self.template_rect['h'] // 2):
+                    xf_new[:, i][0] = int(self.template_rect['h'] // 2)
+                elif (sample[0] + rnum) >= int(self.fy - self.template_rect['h'] // 2):
+                    xf_new[:, i][0] = int(self.fy - self.template_rect['h'] // 2)
+                else:
+                    xf_new[:, i][0] = (sample[0] + rnum)
+                break
+
+            self.particles[i] = xf_new[:, i]
+
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY).astype(np.float64)
+
+            patch = gray[xf_new[:, i][0] - self.hy -1 : xf_new[:, i][0] + self.hy + 1, xf_new[:, i][1] - self.wx -1 : xf_new[:, i][1] + self.wx + 1]
+
+            mse = np.mean(np.square(self.gray_t - patch), dtype=np.float64)
+
+            w_new[i] = np.exp(-mse / (2 * self.sigma_exp))
+
+        self.xf = np.copy(xf_new)
+        self.weights = np.copy(w_new)
+
+        if np.sum(self.weights) > 0.0:
+            self.weights = self.weights / np.sum(self.weights)
+        else:
+            self.weights = np.ones(nump, dtype=np.float64) / (nump)
+
+        idx = self.weights.argmax()
+        u_weighted_mean = self.particles[idx, 0]
+        v_weighted_mean = self.particles[idx, 1]
+
+        best_t = gray[int(u_weighted_mean) - self.hy - 1: int(u_weighted_mean) + self.hy + 1,
+                      int(v_weighted_mean) - self.wx - 1: int(v_weighted_mean) + self.wx + 1]
+        self.gray_t = self.alpha * best_t + (1 - self.alpha) * self.gray_t
+        self.frame_number += 1
+        #print "frame number... %s" %self.frame_number
 
 
 class MeanShiftLitePF(ParticleFilter):

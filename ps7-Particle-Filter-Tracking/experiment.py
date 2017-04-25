@@ -233,11 +233,11 @@ def part_1b():
 
 
 def part_2a():
-    num_particles = 0.  # Define the number of particles
-    sigma_mse = 0.  # Define the value of sigma for the measurement exponential equation
-    sigma_dyn = 0.  # Define the value of sigma for the particles movement (dynamics)
-    alpha = 0.  # Set a value for alpha
-    template_rect = {}  # Define the template window values
+    num_particles = 150  # Define the number of particles
+    sigma_mse = 10.0  # Define the value of sigma for the measurement exponential equation
+    sigma_dyn = 15.0  # Define the value of sigma for the particles movement (dynamics)
+    alpha = 0.50  # Set a value for alpha
+    template_rect = {'x': 530, 'y': 382, 'w': 94, 'h': 110}  # Define the template window values
 
     run_particle_filter(AppearanceModelPF,  # particle filter model class
                         os.path.join(input_dir, "pres_debate.mp4"),  # input video
@@ -253,11 +253,11 @@ def part_2a():
 
 
 def part_2b():
-    num_particles = 0.  # Define the number of particles
-    sigma_mse = 0.  # Define the value of sigma for the measurement exponential equation
-    sigma_dyn = 0.  # Define the value of sigma for the particles movement (dynamics)
-    alpha = 0.  # Set a value for alpha
-    template_rect = {}  # Define the template window values
+    num_particles = 150  # Define the number of particles
+    sigma_mse = 10.0  # Define the value of sigma for the measurement exponential equation
+    sigma_dyn = 15.0  # Define the value of sigma for the particles movement (dynamics)
+    alpha = 0.50  # Set a value for alpha
+    template_rect = {'x': 530, 'y': 382, 'w': 94, 'h': 110}  # Define the template window values
 
     run_particle_filter(AppearanceModelPF,  # particle filter model class
                         os.path.join(input_dir, "noisy_debate.mp4"),  # input video
