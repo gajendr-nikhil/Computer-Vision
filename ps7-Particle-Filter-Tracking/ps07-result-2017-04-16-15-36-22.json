@@ -1,0 +1,19 @@
+{
+    "tests": [
+        {
+            "output": {
+                "passfail": "failed"
+            },
+            "traceback": "Traceback (most recent call last):\n  File \"/home/vmuser_nbmvixop/CVResult.py\", line 29, in func_wrapper\n    ans = func(self)\n  File \"run.py\", line 204, in test_appearance_particle_filter\n    alpha=alpha)\n  File \"run.py\", line 107, in check_center\n    actual_center, max_distance, kwargs))\nAssertionError: Test failed at frame: 11 / 400. \nEstimated center is too far from the actual center. \nStudent's center: [0.0, 0.0] \nActual center: [125, 290] \nMax euclidean distance allowed: 75.0 \nParameters used: {'num_particles': 400, 'sigma_mse': 10.0, 'sigma_dyn': 20.0, 'alpha': 0.05}\n",
+            "description": "Tests Appearance Particle Filter (Not Graded. Prototype test.)"
+        },
+        {
+            "output": {
+                "passfail": "passed"
+            },
+            "traceback": "",
+            "description": "Tests base particle_filter (100 points)"
+        }
+    ],
+    "unauthorized_lib_calls": []
+}
